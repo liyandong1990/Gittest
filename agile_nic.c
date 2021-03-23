@@ -401,12 +401,12 @@ static void set_virtqueue_addr(unsigned index, struct virtqueue *vq,
 
 /* Create virtqueue and write addr to the card */
 static struct virtqueue *setup_vq(struct virtio_device *vdev,
-					unsigned index,
-					void (*callback)(struct virtqueue *vq),
-					const char *name,
-					bool ctx,
-					u16 msix_vec,
-					unsigned nvqs)
+				unsigned index,
+				void (*callback)(struct virtqueue *vq),
+				const char *name,
+				bool ctx,
+				u16 msix_vec,
+				unsigned nvqs)
 {
 	struct agile_pci_device *ap_dev = to_ap_device(vdev);	
 	u16 recv_offset = offsetof(struct pf_net_cfg, rcv_queue);
@@ -682,20 +682,20 @@ error_find:
  * @param vqs[]: output parammeters, used to record vq addr
  */	       
 static int ap_find_vqs(struct virtio_device *vdev,
-				     unsigned int nvqs,
-				     struct virtqueue *vqs[],
-				     vq_callback_t *callbacks[],
+			     unsigned int nvqs,
+			     struct virtqueue *vqs[],
+			     vq_callback_t *callbacks[],
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
-				     const char * const names[],
-				     const bool *ctx,
-				     struct irq_affinity *desc)
+			     const char * const names[],
+			     const bool *ctx,
+			     struct irq_affinity *desc)
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
-				     const char * const names[],
-				     struct irq_affinity *desc)
+			     const char * const names[],
+			     struct irq_affinity *desc)
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 5, 0) || RHEL_RELEASE_CODE >= 1796
-				     const char * const names[])
+			     const char * const names[])
 #else
-				     const char *names[])
+			     const char *names[])
 #endif
 {
 	int ret;
@@ -798,8 +798,8 @@ static const struct virtio_config_ops agile_net_virtio_config_ops = {
 	.get_features	= ap_get_features,
 	.finalize_features = ap_finalize_features,
 	.bus_name	= ap_bus_name,		
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
 	.set_vq_affinity = ap_set_vq_affinity,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,5,0)
 	.get_vq_affinity = ap_get_vq_affinity,
 #endif
 };

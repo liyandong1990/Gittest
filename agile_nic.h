@@ -60,7 +60,7 @@ struct vport_config {
 	u32 feature;
 	u16 status; 			
 	u16 reserved;
-	u32 health_cnt; 		/* health count */
+	u32 health_cnt;			/* health count */
 	u8 mac[ETH_ALEN];
 	u16 mtu;
 };
