@@ -13,7 +13,6 @@
 
 #define pr_fmt(fmt) "agile_nic: " fmt
 
-
 #define DEBUG
 #include <linux/module.h>
 #include <linux/virtio.h>
@@ -771,7 +770,7 @@ int ap_set_vq_affinity(struct virtqueue *vq, int cpu)
 }
 
 const struct cpumask *ap_get_vq_affinity(struct virtio_device *vdev, 
-												int index)
+				int index)
 {
 	struct agile_pci_device *ap_dev = to_ap_device(vdev);
 	
@@ -829,7 +828,6 @@ int register_virtio(struct pci_dev *pci_dev,  struct agile_pci_device *ap_dev)
 	
 	return rc;
 }
-
 
 static void unregister_virtio(struct pci_dev *pci_dev)
 {
@@ -913,39 +911,6 @@ void start_keepalive_detection(struct agile_pci_device *ap_dev)
 	add_timer(&ap_dev->keepalive_timer);
 }
 
-static void read_card_initdata( struct agile_pci_device *ap_dev)
-{
-	u32 hcnt = 0;
-	struct pf_net_cfg *pncfg = ap_dev->pncfg;
-	void __iomem *bcfg_addr = ap_dev->cf_base + offsetof(struct pf_net_cfg, base_cfg);
-	void __iomem *vcfg_addr = get_vcfg_addr(&ap_dev->vdev);
-		
-	pncfg->base_cfg.fv_major = readw (bcfg_addr + offsetof(struct base_config, fv_major));
-	pncfg->base_cfg.fv_minor = readw(bcfg_addr + offsetof(struct base_config, fv_minor));
-	
-	pncfg->vport_cfg.qnum = ioread16(vcfg_addr + offsetof(struct vport_config, qnum)); 
-	pncfg->vport_cfg.qlen = ioread16(vcfg_addr + offsetof(struct vport_config, qlen));
-	pncfg->vport_cfg.feature = ioread32(vcfg_addr + offsetof(struct vport_config, feature));	
-	pncfg->vport_cfg.status = ioread16(vcfg_addr + offsetof(struct vport_config, status)); 
-	hcnt =	ioread32(vcfg_addr + offsetof(struct vport_config, health_cnt));
-	
-	pncfg->vport_cfg.mtu = ioread16(vcfg_addr + offsetof(struct vport_config, mtu));
-	
-	pr_debug("%d -> bar2 fv_major: %x, fv_minor:%x, qnum: %x, qlen:%x, \
-feature:%x, status:%x, health_cnt:%x, mtu:%x \n", 
-			pncfg->vport_cfg.qnum,
-			pncfg->base_cfg.fv_major, 
-			pncfg->base_cfg.fv_minor,
-			pncfg->vport_cfg.qnum,
-			pncfg->vport_cfg.qlen, 
-			pncfg->vport_cfg.feature, 
-			pncfg->vport_cfg.status, 
-			hcnt,
-			pncfg->vport_cfg.mtu);
-	
-}
-
-
 static int agile_dev_init(struct pci_dev *pdev, 
 			int bars, void __iomem *const addr)
 {
@@ -974,10 +939,6 @@ static int agile_dev_init(struct pci_dev *pdev,
 	INIT_LIST_HEAD(&ap_dev->virtqueues);
 	spin_lock_init(&ap_dev->lock);
 	pci_set_drvdata(pdev,ap_dev);
-
-	pr_info("%s \n", __func__);
-
-	read_card_initdata(ap_dev);
 	
 	if(!reset_dev(&ap_dev->vdev)) {
 		goto err_card;
@@ -1005,27 +966,6 @@ static void agile_dev_uninit(struct agile_pci_device *ap_dev)
 	ap_dev->pncfg = NULL;
 	kfree(ap_dev);
 	ap_dev = NULL;
-}
-
-static void pr_pci_headinfo(struct pci_dev *pdev)
-{
-	u8 rev_id, h_type;
-	u16 class_code, did, vid, cmd, status;
-	
-	/* This should be the same as the address set in uboot */
-	pci_read_config_word(pdev, PCI_VENDOR_ID, &vid);
-	pci_read_config_word(pdev, PCI_DEVICE_ID, &did);
-	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
-	pci_read_config_word(pdev, PCI_STATUS, &status);
-	pci_read_config_byte(pdev, PCI_REVISION_ID, &rev_id);
-	pci_read_config_word(pdev, PCI_CLASS_DEVICE, &class_code);  
-	pci_read_config_byte(pdev, PCI_HEADER_TYPE, &h_type);
-	
-	pr_debug("VendorID: %x, DeviceID: %x, Command: %x, \
-Status: %x, Class_code: %x, \
-Rev_ID: %x, Header_type:%x\n",
-		vid, did,cmd, status, class_code, rev_id, h_type);	
-
 }
 
 static int agile_pci_net_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
@@ -1075,8 +1015,6 @@ Trying to continue, but this might not work.\n");
 		dev_err(&pdev->dev, "BAR2 pci_ioremap_bar err\n"); 
 		goto err_iospace;
 	}
-	pr_pci_headinfo(pdev);
-
 
 	ret = agile_dev_init(pdev, bars, bar2_addr);
 	if(ret < 0) {
@@ -1132,7 +1070,6 @@ static int agile_pci_sriov_configure(struct pci_dev *pdev, int num_vfs)
 	return num_vfs;
 }
 
-
 static const struct pci_device_id agile_pci_id_tbl[] = {
 	{
 		.vendor		= AGILE_VENDOR_ID,
@@ -1150,12 +1087,8 @@ static struct pci_driver pci_net_driver = {
 	.id_table = agile_pci_id_tbl,
 	.probe    = agile_pci_net_probe,
 	.remove   = agile_pci_net_remove,
-
 	.sriov_configure = agile_pci_sriov_configure,
 };
-
-
-
 
 module_pci_driver(pci_net_driver);
 

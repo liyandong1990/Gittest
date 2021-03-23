@@ -22,8 +22,8 @@
 
 #define AGILE_DRIVER_VERSION  "0.0.1"
 	
-#define AGILE_VENDOR_ID 			0x1957
-#define AGILE_DEVICE_ID 			0x1000	/* device ID: 0x1000 - 0x103F */
+#define AGILE_VENDOR_ID				0x1957
+#define AGILE_DEVICE_ID				0x1000	/* device ID: 0x1000 - 0x103F */
 
 #define VENDOR_CONFIG_S_LINK_UP		0x01
 #define VENDOR_CONFIG_S_DEVICE_OK	0x02
@@ -135,7 +135,7 @@ struct agile_pci_device {
 	struct timer_list keepalive_timer;	
 	bool last_health;
 	int health_num;				/* health number */
-	bool board_alive; 			/* Whether the network card is alive ? */
+	bool board_alive;			/* Whether the network card is alive ? */
 	
 	/* a list of queues so we can dispatch IRQs */
 	spinlock_t lock;
@@ -147,9 +147,9 @@ struct agile_pci_device {
 	/* MSI-X support */
 	int msix_enabled;
 	cpumask_var_t *msix_affinity_masks;   /* vectors masks */
-	bool per_vq_vectors;		/* Whether we have vector per vq */
-	unsigned msix_vectors;		/* Number of available vectors */	
-	unsigned msix_used_vectors; /* Vectors allocated, excluding per-vq vectors if any */	
+	bool per_vq_vectors;			/* Whether we have vector per vq */
+	unsigned msix_vectors;			/* Number of available vectors */	
+	unsigned msix_used_vectors;		/* Vectors allocated, excluding per-vq vectors if any */	
 	char (*msix_names)[256];
 };
 
@@ -161,7 +161,7 @@ enum {
 	AP_MSIX_VQ_VECTOR = 1,
 };
 
-	
+
 #endif
 	
 	
